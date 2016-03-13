@@ -49,6 +49,10 @@ bool _static_initThisModule=[](){
 #endif
 
 QtUtility::QtUtility(){
+    if(_static_initThisModule){
+        /*update rand*/
+        _static_initThisModule=bool(std::rand()&1);
+    }
 }
 
 QtUtility::~QtUtility(){
