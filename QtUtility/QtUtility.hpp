@@ -59,6 +59,8 @@ public:
 
 };
 
+#include "ReadOnly.hpp"
+
 #endif // QTUTILITY_HPP
 
 /*

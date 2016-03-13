@@ -23,7 +23,8 @@ DEFINES += LUA_USE_LINUX
 
 SOURCES += $$PWD/source/QtUtility.cpp
 
-HEADERS += $$PWD/QtUtility.hpp
+HEADERS += $$PWD/QtUtility.hpp \
+    ReadOnly.hpp
 HEADERS += $$PWD/qtutility_global.hpp
 
 include($$PWD/quazip/quazip.pri)
