@@ -3,6 +3,8 @@
 
 #include "qtutility_global.hpp"
 #include <QtCore/qcoreapplication.h>
+#include <QtCore/qshareddata.h>
+#include <QtCore/qsharedpointer.h>
 
 #include <limits>
 #include <memory>
@@ -59,9 +61,9 @@ public:
 
 };
 
-#include "ReadOnly.hpp"
-
 #endif // QTUTILITY_HPP
+
+#include "ReadOnly.hpp"
 
 /*
  * 本模块包含QUAZIP LUA

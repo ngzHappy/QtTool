@@ -2,6 +2,7 @@
 #include <QApplication>
 
 #include <QtUtility.hpp>
+#include <QDebug>
 #include <iostream>
 
 int main(int argc, char *argv[])
@@ -26,6 +27,7 @@ int main(int argc, char *argv[])
     }
 
     MainWiindow window;
+    qDebug()<<"window is visible:"<<readOnly(window).isVisible();
     window.show();
 
     return app.exec();
