@@ -48,6 +48,7 @@ public:
 
     static QtUtilityPrivateStaticData & staticData();
 
+    /*construct and destruct static data in this module*/
     static void addConstructFunction(ConstructFunctionType);
     static void addDestructFunction(DestructFunctionType);
     static void construct();
