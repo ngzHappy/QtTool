@@ -21,7 +21,6 @@ win32{
 DEFINES += LUA_USE_LINUX
 }
 
-
 SOURCES += $$PWD/source/QtUtility.cpp
 
 HEADERS += $$PWD/QtUtility.hpp
@@ -29,5 +28,6 @@ HEADERS += $$PWD/qtutility_global.hpp
 
 include($$PWD/quazip/quazip.pri)
 include($$PWD/lua/lua.pri)
-INCLUDEPATH += $$PWD
+include($$PWD/QtUtility.pri)
 
+DESTDIR = $$QtUtilityOutPath
