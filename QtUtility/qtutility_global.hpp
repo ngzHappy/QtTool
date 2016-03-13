@@ -1,0 +1,12 @@
+﻿#ifndef QTUTILITY_GLOBAL_HPP
+#define QTUTILITY_GLOBAL_HPP
+
+#include <QtCore/qglobal.h>
+
+#if defined(QTUTILITY_LIBRARY)
+#  define QTUTILITYSHARED_EXPORT Q_DECL_EXPORT
+#else
+#  define QTUTILITYSHARED_EXPORT Q_DECL_IMPORT
+#endif
+
+#endif // QTUTILITY_GLOBAL_HPP
