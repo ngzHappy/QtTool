@@ -107,6 +107,6 @@ QtUtility * QtUtility::instance(){
 
 /*
  * 此文件应当采用UTF8 with bom的方式编码
- * Final
+ * Final file
 */
 
