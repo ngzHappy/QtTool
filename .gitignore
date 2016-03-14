@@ -8,3 +8,4 @@ QtUtility/lua/lua.txt
 *.exe
 *.ilk
 *.lib
+*.a
