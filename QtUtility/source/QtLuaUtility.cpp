@@ -2,7 +2,9 @@
 /*this file is + lua library*/
 
 #include "QtUtility.hpp"
+
 #include <sstream>
+#include <iostream>
 
 #if !defined(FLOAT_PRECISION)
 namespace {
@@ -517,6 +519,7 @@ print_next_start:
 }
 
 int LuaUtility::copyTable(lua_State *L) {
+    if (L==nullptr) { return 0; }
     return __cct::__private::luaL_copyTable(L);
 }
 
@@ -524,6 +527,56 @@ void LuaUtility::printTable(
         lua_State *L,
         std::function<void(const std::string &)> print_) {
     return __cct::__private::luaL_printTable(L,std::move(print_));
+}
+
+int LuaUtility::showTable(lua_State * L) {
+    if (L==nullptr) { return 0; }
+    printTable(L,[](const std::string & str) {
+        std::cout<<str;
+    });
+    std::cout.flush();
+    return 0;
+}
+
+int LuaUtility::tableToString(lua_State * L) {
+    if (L==nullptr) { return 0; }
+    std::list<std::string> tmp_;
+    std::string::size_type length_=0;
+    printTable(L,[&tmp_,&length_](const std::string & str) {
+        length_+=(str.size()+1);
+        tmp_.push_back(str);
+    });
+
+    {
+        luaL_Buffer buffer_;
+        luaL_buffinitsize(L,&buffer_,length_);
+        while ( tmp_.empty()==false ) {
+            std::string str = std::move(*tmp_.begin());
+            tmp_.pop_front();
+            luaL_addlstring(&buffer_,str.c_str(),str.size());
+        }
+        luaL_pushresult(&buffer_);
+    }
+    
+    return 1;
+}
+
+int LuaUtility::openLib(lua_State * L) {
+    constexpr const static struct luaL_Reg libs_[]{
+        {"copyTable",&LuaUtility::copyTable},
+        {"showTable",&LuaUtility::showTable},
+        {"tableToString",&LuaUtility::tableToString},
+        {nullptr,nullptr}
+    };
+    
+    luaL_newlib(L,libs_);
+ 
+    return 1;
+}
+
+void LuaUtility::loadModule(lua_State * L) {
+    luaL_requiref(L,"utility",&LuaUtility::openLib,1);
+    lua_pop(L, 1);  /* remove lib */
 }
 
 /*

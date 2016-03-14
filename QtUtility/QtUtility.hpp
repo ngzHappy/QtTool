@@ -47,8 +47,6 @@ public:
     typedef FunctionType ConstructFunctionType;
     typedef FunctionType DestructFunctionType;
 
-    QtUtility();
-
     static QtUtilityPrivateStaticData & staticData();
 
     /*construct and destruct static data in this module*/
@@ -61,6 +59,7 @@ public:
     static QThread * mainQThread(){ return qApp->thread(); }
     static std::thread::id mainThread() ;
 protected:
+    QtUtility();
     virtual ~QtUtility();
 };
 

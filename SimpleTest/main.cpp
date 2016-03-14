@@ -18,7 +18,10 @@ int main(int argc, char *argv[])
     {
        lua_State * L = luaL_newstate();
        luaL_openlibs( L );
-       luaL_dostring(L,"print(\"Hellow Word!\")");
+       LuaUtility::loadModule(L);
+       luaL_dostring(L,"a={1,2,3}");
+       luaL_dostring(L,"utility.showTable(\"a\",a)");
+       qDebug()<<"lua top:"<< lua_gettop(L);
        lua_close( L );
     }
 
@@ -46,7 +49,7 @@ int main(int argc, char *argv[])
     MainWiindow window;
     qDebug()<<"window is visible:"<<readOnly(window).isVisible();
     window.show();
-
+  
     return app.exec();
 }
 
