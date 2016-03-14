@@ -557,7 +557,7 @@ int LuaUtility::tableToString(lua_State * L) {
         }
         luaL_pushresult(&buffer_);
     }
-    
+
     return 1;
 }
 
@@ -568,9 +568,9 @@ int LuaUtility::openLib(lua_State * L) {
         {"tableToString",&LuaUtility::tableToString},
         {nullptr,nullptr}
     };
-    
+
     luaL_newlib(L,libs_);
- 
+
     return 1;
 }
 
@@ -582,6 +582,7 @@ void LuaUtility::loadModule(lua_State * L) {
 /*
  * 扩展LUA
  * 此文件应当采用utf8 with bom 编码
+ * Final
 */
 
 
