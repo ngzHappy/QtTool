@@ -40,16 +40,16 @@ public:
     enum { value=0 };
     typedef std::add_const_t< std::remove_reference_t<_T_> > const_type;
     template<typename _U_>
-    static const_type & eval(_U_ & value_) { return value_; }
+    static const_type & eval(_U_ & value_) noexcept { return value_; }
 };
 
 /*namespace*/
-}
-}
-}
+}/*namespace __private*/
+}/*namespace __cct*/
+}/*namespace*/
 
 template<typename _T_  >
-decltype(auto) readOnly(_T_ & value_) {
+inline decltype(auto) readOnly(_T_ & value_) {
     static_assert(false==std::is_reference<_T_>::value,"type should not be & or &&");
     return __cct::__private::___IsShared<_T_>::eval(value_);
 }
