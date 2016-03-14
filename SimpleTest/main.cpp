@@ -5,6 +5,12 @@
 #include <QDebug>
 #include <iostream>
 
+class TestShared5 : public std::shared_ptr<int> {
+    typedef std::shared_ptr<int> P;
+public:
+    TestShared5() :P(new int(5)){}
+};
+
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
@@ -28,11 +34,13 @@ int main(int argc, char *argv[])
 
     {
         std::shared_ptr<int> value0(new int(0));
-        QSharedPointer<int> value1(new int(1));
+        QSharedPointer<const int> value1(new int(1));
         int value2=2;
+        TestShared5 value5;
         qDebug()<< readOnly(value2);
         qDebug()<< *readOnly(value1);
         qDebug()<< *readOnly(value0);
+        qDebug()<< *readOnly(value5);
     }
 
     MainWiindow window;
