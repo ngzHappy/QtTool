@@ -1,5 +1,6 @@
-
+#git submodule add https://github.com/ngzHappy/QtTool
 INCLUDEPATH += $$PWD
+#include($$PWD/../QtTool/QtUtility/QtUtility.pri)
 #DESTDIR = $$QtUtilityOutPath
 #CONFIG(debug,debug|release){
 #LIBS +=-L$$QtUtilityOutPath -lQtUtilityd
