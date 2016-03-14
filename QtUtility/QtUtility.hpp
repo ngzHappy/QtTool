@@ -65,6 +65,7 @@ protected:
 };
 
 #include "ReadOnly.hpp"
+#include "LUAUtiltiy.hpp"
 
 #endif // QTUTILITY_HPP
 
