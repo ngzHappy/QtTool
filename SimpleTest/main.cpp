@@ -26,6 +26,15 @@ int main(int argc, char *argv[])
         zip.isOpen();
     }
 
+    {
+        std::shared_ptr<int> value0(new int(0));
+        QSharedPointer<int> value1(new int(1));
+        int value2=2;
+        qDebug()<< readOnly(value2);
+        qDebug()<< *readOnly(value1);
+        qDebug()<< *readOnly(value0);
+    }
+
     MainWiindow window;
     qDebug()<<"window is visible:"<<readOnly(window).isVisible();
     window.show();

@@ -43,6 +43,7 @@ static int decrypt_byte(unsigned long* pkeys, const z_crc_t FAR * pcrc_32_tab UN
 
     temp = ((unsigned)(*(pkeys+2)) & 0xffff) | 2;
     return (int)(((temp * (temp ^ 1)) >> 8) & 0xff);
+    (void)pcrc_32_tab;
 }
 
 /***********************************************************************
