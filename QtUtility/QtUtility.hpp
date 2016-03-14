@@ -48,7 +48,6 @@ public:
     typedef FunctionType DestructFunctionType;
 
     QtUtility();
-    virtual ~QtUtility();
 
     static QtUtilityPrivateStaticData & staticData();
 
@@ -57,10 +56,12 @@ public:
     static void addDestructFunction(DestructFunctionType);
     static void construct();
     static void destruct();
+    static QtUtility * instance();
 
     static QThread * mainQThread(){ return qApp->thread(); }
     static std::thread::id mainThread() ;
-
+protected:
+    virtual ~QtUtility();
 };
 
 #include "ReadOnly.hpp"

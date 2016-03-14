@@ -24,11 +24,15 @@ QtUtility::QtUtilityPrivateStaticData_ * QtUtility::staticData_ = nullptr ;
 
 class QtUtility::QtUtilityPrivateStaticData_{
 public:
+    QtUtility * const thisModule;
     std::forward_list<ConstructFunctionType> constructFunctions;
     std::forward_list<DestructFunctionType> destructFunctions;
     std::thread::id mainThreadID;
-    QtUtilityPrivateStaticData_(){
+    QtUtilityPrivateStaticData_():thisModule(new QtUtility){
         mainThreadID=std::this_thread::get_id();
+    }
+    ~QtUtilityPrivateStaticData_(){
+        delete thisModule;
     }
 };
 
@@ -97,6 +101,9 @@ QtUtility::QtUtilityPrivateStaticData & QtUtility::staticData(){
     return *staticData_;
 }
 
+QtUtility * QtUtility::instance(){
+    return staticData().thisModule;
+}
 
 /*
  * 此文件应当采用UTF8 with bom的方式编码
