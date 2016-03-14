@@ -7,6 +7,7 @@
 #include <QtCore/qsharedpointer.h>
 
 #include <limits>
+#include <ciso646>
 #include <memory>
 #include <thread>
 #include <cstddef>
@@ -38,6 +39,7 @@ class QTUTILITYSHARED_EXPORT QtUtility : public QObject
 public:
     class QtUtilityPrivateStaticData_;
     typedef QtUtility::QtUtilityPrivateStaticData_ QtUtilityPrivateStaticData;
+private:
     static QtUtility::QtUtilityPrivateStaticData_ * staticData_ ;
 public:
 
@@ -61,9 +63,9 @@ public:
 
 };
 
-#endif // QTUTILITY_HPP
-
 #include "ReadOnly.hpp"
+
+#endif // QTUTILITY_HPP
 
 /*
  * 本模块包含QUAZIP LUA
