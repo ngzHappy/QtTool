@@ -4,6 +4,7 @@
 //#include "QtUtility.hpp"
 
 namespace {
+namespace __header{
 namespace __cct {
 namespace __private {
 
@@ -46,12 +47,13 @@ public:
 /*namespace*/
 }/*namespace __private*/
 }/*namespace __cct*/
+}/*namespace __header*/
 }/*namespace*/
 
 template<typename _T_  >
 inline decltype(auto) readOnly(_T_ & value_) {
     static_assert(false==std::is_reference<_T_>::value,"type should not be & or &&");
-    return __cct::__private::___IsShared<_T_>::eval(value_);
+    return __header::__cct::__private::___IsShared<_T_>::eval(value_);
 }
 
 
