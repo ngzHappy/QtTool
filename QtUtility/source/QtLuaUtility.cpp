@@ -582,7 +582,7 @@ void LuaUtility::loadModule(lua_State * L) {
 /*
  * 扩展LUA
  * 此文件应当采用utf8 with bom 编码
- * F inal
+ * Final
 */
 
 
