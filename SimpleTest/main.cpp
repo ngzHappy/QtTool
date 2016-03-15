@@ -1,6 +1,7 @@
 ﻿#include "MainWiindow.hpp"
 #include <QApplication>
 
+#include <cassert>
 #include <QtUtility.hpp>
 #include <QDebug>
 #include <iostream>
@@ -17,12 +18,55 @@ int main(int argc, char *argv[])
 
     {
        lua_State * L = luaL_newstate();
+       std::shared_ptr<lua_State> L_(L,[](lua_State *_L){
+           lua_close(_L);
+       });
        luaL_openlibs( L );
        LuaUtility::loadModule(L);
-       luaL_dostring(L,"a={1,2,3}");
+       luaL_dostring(L,"a={71,2,3}");
        luaL_dostring(L,"utility.showTable(\"a\",a)");
+       LuaValue value(nullptr);
+       lua_getglobal(L,"a");
+       value.setLuaState(L_);
+       value.setTable();
+       lua_settop(L,0);
+       value.pushValue();
+
+       if( lua_istable(L,-1) ) {
+           lua_rawgeti(L,-1,1);
+           qDebug()<<lua_tointeger(L,-1);
+       }
        qDebug()<<"lua top:"<< lua_gettop(L);
-       lua_close( L );
+       
+       lua_pushinteger(L,3);
+       lua_pushinteger(L,2);
+       lua_pushinteger(L,1);
+       lua_rotate(L,-3,1);
+       //lua_rotate(L,-2,0);
+
+       qDebug()
+           <<lua_tointeger(L,-1)
+           <<lua_tointeger(L,-2)
+           <<lua_tointeger(L,-3);
+
+       luaL_dostring(L,R"(return function() 
+print("function call " .. tostring(199) ) 
+end
+)"
+);
+       value.setFunction();
+       value();
+
+       luaL_dostring(L,R"(return function(x,y,z) 
+print("function call " .. tostring(x) .. " " .. tostring(y) .. " " .. tostring(z) ) 
+end)");
+       value.setFunction();
+       lua_pushinteger(L,667);
+       lua_pushinteger(L,668);
+       lua_pushinteger(L,669);
+
+       value(3);
+
     }
 
     {
@@ -49,7 +93,7 @@ int main(int argc, char *argv[])
     MainWiindow window;
     qDebug()<<"window is visible:"<<readOnly(window).isVisible();
     window.show();
-  
+
     return app.exec();
 }
 

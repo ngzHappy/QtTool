@@ -5,6 +5,7 @@
 #include <QtCore/qcoreapplication.h>
 #include <QtCore/qshareddata.h>
 #include <QtCore/qsharedpointer.h>
+#include <QtCore/qvariant.h>
 
 #include <limits>
 #include <ciso646>

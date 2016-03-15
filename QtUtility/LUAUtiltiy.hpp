@@ -1,7 +1,6 @@
 ﻿#if  !defined(_0_LUAUTILTIY_HPP)
 #define _0_LUAUTILTIY_HPP
 
-#include <QtCore/qvariant.h>
 #include "QtUtility.hpp"
 
 class QTUTILITYSHARED_EXPORT LuaUtility {
@@ -21,18 +20,72 @@ protected:
     static void printTable(lua_State * L ,std::function<void(const std::string &)> print_) ;
 };
 
-class QTUTILITYSHARED_EXPORT LuaValue : public QVariant {
-    typedef QVariant P;
+class QTUTILITYSHARED_EXPORT LuaValue {
 public:
-    using QVariant::QVariant;
-    LuaValue(){}
-    LuaValue(const LuaValue &)=default;
-    LuaValue(LuaValue &&)=default;
-    LuaValue&operator=(const LuaValue &)=default;
-    LuaValue&operator=(LuaValue &&)=default;
-    explicit LuaValue(const QVariant & value_):QVariant(value_){}
-    explicit LuaValue(QVariant && value_):QVariant(std::move(value_)){}
-    ~LuaValue()=default;
+    typedef int Type ;
+    enum : int{
+        Type_NIL,
+        Type_Function,
+        Type_Table,
+        Type_Count
+    };
+private:
+    class TypePointer_{
+    public:
+        char pointersSet[4];char tablePath[4];
+        TypePointer_(){
+            pointersSet[0]='p';pointersSet[1]='s';pointersSet[2]='e';pointersSet[3]='t';
+            tablePath[0]='t';tablePath[1]='p';tablePath[2]='t';tablePath[3]='h';
+        }
+    };
+    static TypePointer_ type_pointer_[Type_Count];
+    class Data_{public:
+                std::weak_ptr<lua_State> luaState_;
+                        int type_ = Type_NIL;
+                                int pointer_ = 0;
+               };
+    std::shared_ptr<Data_> data_;
+public:
+
+    LuaValue();
+    LuaValue(decltype(nullptr)){/**/}
+    virtual ~LuaValue();
+
+    QVariant getValue() const;
+    void setTable();
+    void setFunction();
+
+    void pushValue() const;
+
+    std::shared_ptr<lua_State> getLuaState() const {
+        if(data_){return data_->luaState_.lock();}
+        return nullptr;
+    }
+
+    void setLuaState(std::shared_ptr<lua_State> &&value_){
+        if(bool(data_)==false){data_=std::shared_ptr<Data_>(new Data_);}
+        data_->luaState_=std::move(value_);
+    }
+
+    void setLuaState(const std::shared_ptr<lua_State> &value_){
+        if(bool(data_)==false){data_=std::shared_ptr<Data_>(new Data_);}
+        data_->luaState_= value_ ;
+    }
+
+    Type getType()const noexcept{return data_->type_;}
+
+    explicit operator bool()const{return bool(data_);}
+
+    void operator()(int argc=0);
+
+protected:
+    static constexpr void * getTablePathPointer(Type v) noexcept{return ( &(type_pointer_[v].tablePath) );}
+    static constexpr void * getTypeSetPointer(Type v) noexcept{return ( &(type_pointer_[v].pointersSet) );}
+    void clear();
+    static void* getTypeSet(lua_State *, Type v);
+    
+private:
+    template< Type >void _setValue(lua_State *);
 };
 
 Q_DECLARE_METATYPE( LuaValue )

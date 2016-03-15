@@ -16,6 +16,283 @@ enum { FLOAT_PRECISION_=FLOAT_PRECISION };
 }
 #endif
 
+/*
+ * static data 生成唯一地址
+*/
+LuaValue::TypePointer_ LuaValue::type_pointer_[LuaValue::Type_Count];
+
+namespace {
+namespace __cct {
+namespace __private {
+
+class PointerSet {
+    PointerSet&operator=(const PointerSet &)=delete;
+    PointerSet&operator=(PointerSet &&)=delete;
+    PointerSet(const PointerSet &)=delete;
+    PointerSet(PointerSet &&)=delete;
+public:
+    std::set<int> used;
+    std::set<int> unused;
+    PointerSet() {
+#if defined(_DEBUG)
+        //std::cout<<" pointer set "<<std::endl; 
+#endif
+    }
+    ~PointerSet() {
+#if defined(_DEBUG)
+        //std::cout<<"~pointer set "<<std::endl; 
+#endif
+    }
+    static constexpr const char * name() {
+        return "PointerSet::pri::cct" __FILE__;
+    }
+};
+
+class TopLock {
+private:
+    TopLock&operator=(TopLock&)=delete;
+    TopLock&operator=(TopLock&&)=delete;
+    TopLock(TopLock&)=delete;
+    TopLock(TopLock&&)=delete;
+    lua_State * L;
+    int top;
+public:
+    TopLock(lua_State * L_):L(L_) { top=lua_gettop(L); }
+    ~TopLock() { lua_settop(L,top); }
+};
+
+/*namespace*/
+}
+}
+}
+
+template<LuaValue::Type _Type_>
+void LuaValue::_setValue(lua_State * L) {
+    if (data_->type_!=_Type_) {
+        clear();
+        data_->type_=_Type_;
+        __cct::__private::PointerSet * _ts_=
+            reinterpret_cast<__cct::__private::PointerSet *>(getTypeSet(L,_Type_));
+
+        if (_ts_->unused.empty()) {
+            _ts_->unused.insert(_ts_->used.size());
+        }
+
+        auto pv_=_ts_->unused.begin();
+        int ps_=*pv_;
+        _ts_->unused.erase(pv_);
+        _ts_->used.insert(ps_);
+
+        data_->pointer_=ps_;
+    }
+}
+template void LuaValue::_setValue<LuaValue::Type_Table>(lua_State * L);
+template void LuaValue::_setValue<LuaValue::Type_Function>(lua_State * L);
+
+void LuaValue::clear() {
+    if (data_) {
+        if (data_->type_==Type_NIL) { return; }
+        std::shared_ptr<lua_State> ls_=data_->luaState_.lock();
+        if (ls_) {
+            lua_State * L=ls_.get();
+            __cct::__private::TopLock topLock(L);
+
+            __cct::__private::PointerSet * _ts_=
+                reinterpret_cast<__cct::__private::PointerSet *>(getTypeSet(L,data_->type_));
+
+            _ts_->used.erase(data_->pointer_);
+            _ts_->unused.insert(data_->pointer_);
+
+            lua_rawgetp(L,LUA_REGISTRYINDEX,getTablePathPointer(data_->type_));
+            if (lua_istable(L,-1)) {
+                lua_pushnil(L);
+                lua_rawseti(L,-2,data_->pointer_);
+            }
+            data_->type_=Type_NIL;
+        }
+    }
+}
+
+LuaValue::~LuaValue() {
+    clear();
+}
+
+LuaValue::LuaValue():data_(new Data_) {
+
+}
+
+QVariant LuaValue::getValue() const {
+    return QVariant();
+}
+
+namespace {
+namespace __cct {
+namespace __private {
+
+int delete_PointerSet(lua_State * _L) {
+    void * data_0_=lua_touserdata(_L,-1);
+    __cct::__private::PointerSet * data_1_=reinterpret_cast<__cct::__private::PointerSet *>(data_0_);
+    data_1_->~PointerSet();
+    return 0;
+}
+
+int error_function(lua_State * L) {
+
+    if (lua_isstring(L,-1)) {
+        std::cout<<"lua error:"<<lua_tostring(L,-1)<<std::endl;
+        std::cout.flush();
+        return 0;
+    }
+
+    if (luaL_callmeta(L,-1,"__tostring")&&
+        (lua_type(L,-1)==LUA_TSTRING)) {
+        std::cout<<"lua error:"<<lua_tostring(L,-1)<<std::endl;
+        std::cout.flush();
+        return 0;
+    }
+
+    std::cout<<"lua error:"<<"????"<<std::endl;
+    std::cout.flush();
+    return 0;
+}
+
+/*namespace*/
+}
+}
+}
+
+void LuaValue::operator()(int argc) {
+    if (argc<0) { argc=0; }
+
+    if (data_) {
+        do {
+            if (data_->type_!=Type_Function) { break; }
+
+            auto ls__=data_->luaState_.lock();
+            if (bool(ls__)==false) { break; }
+            lua_State * L=ls__.get();
+
+            lua_rawgetp(L,LUA_REGISTRYINDEX,getTablePathPointer(Type_Function));
+            if (lua_istable(L,-1)) {
+                lua_rawgeti(L,-1,data_->pointer_);
+                if (lua_isfunction(L,-1)) {
+                    if (argc==0) {
+                        lua_pushcfunction(L,&__cct::__private::error_function);
+                        lua_replace(L,-3);
+                        lua_pcall(L,0,LUA_MULTRET,-2);
+                    }
+                    else {
+                        const auto _argc_1=1+argc;
+                        const auto _argc_2=_argc_1+1;
+                        lua_copy(L,-1,-2); lua_pop(L,1);
+                        lua_insert(L,lua_gettop(L)-_argc_1);/*set function to bottom*/
+                        lua_pushcfunction(L,&__cct::__private::error_function);
+                        lua_insert(L,lua_gettop(L)-_argc_2);/*set error function to bottom*/
+                        lua_pcall(L,argc,LUA_MULTRET,lua_gettop(L)-_argc_2);
+                    }
+                }
+            }
+        } while (0);
+    }
+    return;
+}
+
+void* LuaValue::getTypeSet(lua_State * L,Type v) {
+
+    lua_rawgetp(L,LUA_REGISTRYINDEX,getTypeSetPointer(v));
+    if (lua_isuserdata(L,-1)==false) {
+
+        void * data__=lua_newuserdata(L,sizeof(__cct::__private::PointerSet));
+        new(data__) __cct::__private::PointerSet;
+
+        luaL_getmetatable(L,__cct::__private::PointerSet::name());
+
+        if (lua_istable(L,-1)==false) {
+
+            lua_pop(L,1);
+            luaL_newmetatable(L,__cct::__private::PointerSet::name());
+
+            lua_pushlstring(L,"__gc",4);/*push key*/
+            lua_pushcfunction(L,&__cct::__private::delete_PointerSet);/*push value*/
+            lua_settable(L,-3);
+        }
+
+        lua_setmetatable(L,-2);
+
+        lua_rawsetp(L,LUA_REGISTRYINDEX,getTypeSetPointer(v));
+        return data__;
+    }
+    return lua_touserdata(L,-1);
+}
+
+void LuaValue::setFunction() {
+    if (bool(data_)==false) { return; }
+    auto ls__=data_->luaState_.lock();
+    if (bool(ls__)==false) { return; }
+    lua_State * L=ls__.get();
+    __cct::__private::TopLock _lock_(L);
+    if (lua_isfunction(L,-1)) {
+        const int value_pos_=lua_gettop(L);
+        _setValue<Type_Function>(L);
+        lua_rawgetp(L,LUA_REGISTRYINDEX,getTablePathPointer(Type_Function));
+        if (lua_istable(L,-1)==false) {
+            lua_pop(L,1);
+            lua_newtable(L);
+            lua_pushvalue(L,-1);
+            lua_rawsetp(L,LUA_REGISTRYINDEX,getTablePathPointer(Type_Function));
+        }
+        lua_pushvalue(L,value_pos_);
+        lua_rawseti(L,-2,data_->pointer_);
+    }
+}
+
+void LuaValue::setTable() {
+    if (bool(data_)==false) { return; }
+    auto ls__=data_->luaState_.lock();
+    if (bool(ls__)==false) { return; }
+    lua_State * L=ls__.get();
+    __cct::__private::TopLock _lock_(L);
+    if (lua_istable(L,-1)) {
+        const int value_pos_=lua_gettop(L);
+        _setValue<Type_Table>(L);
+        lua_rawgetp(L,LUA_REGISTRYINDEX,getTablePathPointer(Type_Table));
+        if (lua_istable(L,-1)==false) {
+            lua_pop(L,1);
+            lua_newtable(L);
+            lua_pushvalue(L,-1);
+            lua_rawsetp(L,LUA_REGISTRYINDEX,getTablePathPointer(Type_Table));
+        }
+        lua_pushvalue(L,value_pos_);
+        lua_rawseti(L,-2,data_->pointer_);
+    }
+}
+
+void LuaValue::pushValue() const {
+    if (bool(data_)==false) { return; }
+    auto ls__=data_->luaState_.lock();
+    if (bool(ls__)==false) { return; }
+    lua_State * L=ls__.get();
+
+    if (data_->type_==Type_NIL) {
+        lua_pushnil(L);
+        return;
+    }
+
+    lua_rawgetp(L,LUA_REGISTRYINDEX,getTablePathPointer(data_->type_));
+    if (lua_istable(L,-1)==false) {
+        lua_pop(L,-1);
+        lua_pushnil(L);
+        return;
+    }
+    else {
+        lua_rawgeti(L,-1,data_->pointer_);
+        lua_copy(L,-1,-2);
+        lua_pop(L,1);
+        return;
+    }
+
+}
+
 namespace {
 namespace __cct {
 namespace __private {
@@ -549,10 +826,10 @@ int LuaUtility::tableToString(lua_State * L) {
 
     {
         std::unique_ptr<luaL_Buffer> buffer__(new luaL_Buffer);
-        register luaL_Buffer & buffer_ = *buffer__;
+        register luaL_Buffer & buffer_=*buffer__;
         luaL_buffinitsize(L,&buffer_,length_);
-        while ( tmp_.empty()==false ) {
-            std::string str = std::move(*tmp_.begin());
+        while (tmp_.empty()==false) {
+            std::string str=std::move(*tmp_.begin());
             tmp_.pop_front();
             luaL_addlstring(&buffer_,str.c_str(),str.size());
         }
@@ -577,7 +854,7 @@ int LuaUtility::openLib(lua_State * L) {
 
 void LuaUtility::loadModule(lua_State * L) {
     luaL_requiref(L,"utility",&LuaUtility::openLib,1);
-    lua_pop(L, 1);  /* remove lib */
+    lua_pop(L,1);  /* remove lib */
     return;
 }
 
