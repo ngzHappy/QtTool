@@ -2,8 +2,9 @@
 CONFIG += c++14
 
 QT += core
-QT += gui
-QT += widgets
+QT -= gui
+#QT += gui
+#QT += widgets
 
 CONFIG(debug,debug|release){
 TARGET = QtUtilityd
@@ -24,8 +25,8 @@ DEFINES += LUA_USE_LINUX
 SOURCES += $$PWD/source/QtUtility.cpp
 SOURCES += $$PWD/source/QtLuaUtility.cpp
 
-HEADERS += $$PWD/QtUtility.hpp \
-    LUAUtiltiy.hpp
+HEADERS += $$PWD/QtUtility.hpp
+HEADERS += $$PWD/LUAUtiltiy.hpp
 HEADERS += $$PWD/ReadOnly.hpp
 HEADERS += $$PWD/qtutility_global.hpp
 

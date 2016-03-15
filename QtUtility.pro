@@ -9,8 +9,11 @@ TEMPLATE = subdirs
 QtUtility.file = $$PWD/QtUtility/QtUtility.pro
 SimpleTest.file = $$PWD/SimpleTest/SimpleTest.pro
 SimpleTest.depends += QtUtility
+SimpleLuaTest.file = $$PWD/SimpleLuaTest/SimpleLuaTest.pro
+SimpleLuaTest.depends += QtUtility
 
 SUBDIRS += QtUtility
+SUBDIRS += SimpleLuaTest
 SUBDIRS += SimpleTest
 
 

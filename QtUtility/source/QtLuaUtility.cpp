@@ -548,7 +548,8 @@ int LuaUtility::tableToString(lua_State * L) {
     });
 
     {
-        luaL_Buffer buffer_;
+        std::unique_ptr<luaL_Buffer> buffer__(new luaL_Buffer);
+        register luaL_Buffer & buffer_ = *buffer__;
         luaL_buffinitsize(L,&buffer_,length_);
         while ( tmp_.empty()==false ) {
             std::string str = std::move(*tmp_.begin());
@@ -577,6 +578,7 @@ int LuaUtility::openLib(lua_State * L) {
 void LuaUtility::loadModule(lua_State * L) {
     luaL_requiref(L,"utility",&LuaUtility::openLib,1);
     lua_pop(L, 1);  /* remove lib */
+    return;
 }
 
 /*
