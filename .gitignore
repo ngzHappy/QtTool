@@ -9,3 +9,4 @@ QtUtility/lua/lua.txt
 *.ilk
 *.lib
 *.a
+binlib/msvc/bin/test0.lua
