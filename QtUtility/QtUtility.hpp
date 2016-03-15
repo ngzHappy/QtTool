@@ -31,20 +31,23 @@
 #include "quazip/quazipdir.h"
 #include "lua/lua.hpp"
 
+#if defined(_DEBUG)
+#include "lua/lstate.h"
+#endif
+
 #include <QtCore/qobject.h>
 #include <QtCore/qthread.h>
 
-class QTUTILITYSHARED_EXPORT QtUtility : public QObject
-{
+class QTUTILITYSHARED_EXPORT QtUtility : public QObject {
     Q_OBJECT
 public:
     class QtUtilityPrivateStaticData_;
     typedef QtUtility::QtUtilityPrivateStaticData_ QtUtilityPrivateStaticData;
 private:
-    static QtUtility::QtUtilityPrivateStaticData_ * staticData_ ;
+    static QtUtility::QtUtilityPrivateStaticData_ * staticData_;
 public:
 
-    typedef void(* FunctionType )(void);
+    typedef void(*FunctionType)(void);
     typedef FunctionType ConstructFunctionType;
     typedef FunctionType DestructFunctionType;
 
@@ -57,8 +60,8 @@ public:
     static void destruct();
     static QtUtility * instance();
 
-    static QThread * mainQThread(){ return qApp->thread(); }
-    static std::thread::id mainThread() ;
+    static QThread * mainQThread() { return qApp->thread(); }
+    static std::thread::id mainThread();
 protected:
     QtUtility();
     virtual ~QtUtility();

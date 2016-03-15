@@ -17,12 +17,8 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
 
     {
-       lua_State * L = luaL_newstate();
-       std::shared_ptr<lua_State> L_(L,[](lua_State *_L){
-           lua_close(_L);
-       });
-       luaL_openlibs( L );
-       LuaUtility::loadModule(L);
+       std::shared_ptr<lua_State> L_=LuaUtility::createLuaState( );
+       lua_State * L=L_.get();
        luaL_dostring(L,"a={71,2,3}");
        luaL_dostring(L,"utility.showTable(\"a\",a)");
        LuaValue value(nullptr);
@@ -30,6 +26,7 @@ int main(int argc, char *argv[])
        value.setLuaState(L_);
        value.setTable();
        lua_settop(L,0);
+       lua_gettop(L);
        value.pushValue();
 
        if( lua_istable(L,-1) ) {

@@ -2,6 +2,7 @@
 /*this file is + lua library*/
 
 #include "QtUtility.hpp"
+#include "lua/lstate.h"
 
 #include <sstream>
 #include <iostream>
@@ -15,6 +16,47 @@ namespace {
 enum { FLOAT_PRECISION_=FLOAT_PRECISION };
 }
 #endif
+
+namespace {
+namespace __cct {
+namespace __private {
+
+std::shared_ptr<lua_State> createLuaState() {
+    lua_State * L=luaL_newstate();
+    L->userCount=1;
+
+    /*open all library*/
+    luaL_openlibs(L);
+    LuaUtility::loadModule(L);
+    
+    return std::shared_ptr<lua_State>(L,[](lua_State * L_) {
+        if (L_==nullptr) { return ; }
+        --(L_->userCount);
+        if (L_->userCount<=0) { lua_close(L_); }
+    });
+}
+
+std::shared_ptr<lua_State> createLuaState(lua_State * L) {
+    if (L==nullptr) { return nullptr; }
+    ++(L->userCount);
+    return std::shared_ptr<lua_State>(L,[](lua_State * L_) {
+        if (L_==nullptr) { return; }
+        --(L_->userCount);
+        if (L_->userCount<=0) { lua_close(L_); }
+    });
+}
+
+/*namespace*/
+}
+}
+}
+
+std::shared_ptr<lua_State> LuaUtility::createLuaState() {
+    return  __cct::__private::createLuaState();
+}
+std::shared_ptr<lua_State> LuaUtility::createLuaState(lua_State* L) {
+    return __cct::__private::createLuaState(L);
+}
 
 /*
  * static data 生成唯一地址

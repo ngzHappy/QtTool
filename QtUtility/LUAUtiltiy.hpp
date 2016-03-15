@@ -5,6 +5,9 @@
 
 class QTUTILITYSHARED_EXPORT LuaUtility {
 public:
+    /*create lua state*/
+    static std::shared_ptr<lua_State> createLuaState();
+    static std::shared_ptr<lua_State> createLuaState(lua_State*);
     /*init utility lib*/
     static int openLib(lua_State * L);
     /*load utility module*/
