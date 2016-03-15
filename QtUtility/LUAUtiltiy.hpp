@@ -1,6 +1,7 @@
 ﻿#if  !defined(_0_LUAUTILTIY_HPP)
 #define _0_LUAUTILTIY_HPP
 
+#include <QtCore/qvariant.h>
 #include "QtUtility.hpp"
 
 class QTUTILITYSHARED_EXPORT LuaUtility {
@@ -19,6 +20,22 @@ protected:
     /*input table name and table*/
     static void printTable(lua_State * L ,std::function<void(const std::string &)> print_) ;
 };
+
+class QTUTILITYSHARED_EXPORT LuaValue : public QVariant {
+    typedef QVariant P;
+public:
+    using QVariant::QVariant;
+    LuaValue(){}
+    LuaValue(const LuaValue &)=default;
+    LuaValue(LuaValue &&)=default;
+    LuaValue&operator=(const LuaValue &)=default;
+    LuaValue&operator=(LuaValue &&)=default;
+    explicit LuaValue(const QVariant & value_):QVariant(value_){}
+    explicit LuaValue(QVariant && value_):QVariant(std::move(value_)){}
+    ~LuaValue()=default;
+};
+
+Q_DECLARE_METATYPE( LuaValue )
 
 #endif // LUAUTILTIY_HPP
 
