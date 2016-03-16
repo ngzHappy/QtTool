@@ -67,6 +67,66 @@ protected:
     virtual ~QtUtility();
 };
 
+class QTUTILITYSHARED_EXPORT KeyUnion {
+public:
+    enum class Type :int {
+        Type_NIL,
+        Type_String,
+        Type_Float,
+        Type_Int,
+    };
+    typedef double Float;
+    typedef int Int;
+private:
+    union Data_ {
+        QByteArray utf8Data;
+        Int intData;
+        Float floatData;
+        Data_() {}
+        ~Data_() {}
+    };
+    Type type_=Type::Type_NIL;
+    Data_ data_;
+public:
+
+    Type getType() const { return type_; }
+    Float getFloat() const { return data_.floatData; }
+    Int getInt() const { return data_.intData; }
+    const QByteArray &getUTF8() const { return data_.utf8Data; }
+
+    QByteArray toUTF8()const;
+    Int toInt(bool * /**/=nullptr)const;
+    Float toFloat(bool * /**/=nullptr)const;
+
+    KeyUnion();
+    KeyUnion(decltype(nullptr)):KeyUnion() {}
+    KeyUnion(const char * v) { setValue(QByteArray(v)); }
+    KeyUnion(const char * v,int l) { setValue(v,l); }
+    KeyUnion(const QString & v) { setValue(v); }
+    KeyUnion(const std::string & v) { setValue(v); }
+    ~KeyUnion();
+
+    KeyUnion(Float);
+    KeyUnion(Int);
+    KeyUnion(QByteArray);
+
+    KeyUnion(const KeyUnion &);
+    KeyUnion(KeyUnion &&);
+    KeyUnion&operator=(const KeyUnion &);
+    KeyUnion&operator=(KeyUnion &&);
+
+    void setValue(Float);
+    void setValue(Int);
+    void setValue(QByteArray &&);
+    void setValue(const QByteArray &);
+    void setValue(decltype(nullptr)) { clear(); }
+    void setValue(const char * v,int l) { setValue(QByteArray(v,l)); }
+    void setValue(const QString & v) { setValue(v.toUtf8()); }
+    void setValue(const std::string & v) { setValue(QByteArray::fromStdString(v)); }
+
+    void clear();
+};
+
 #include "ReadOnly.hpp"
 #include "LUAUtiltiy.hpp"
 #include "QtTextDocumentLayout.hpp"

@@ -42,7 +42,8 @@ TextEdit::TextEdit(QWidget * p)
         tc.insertFrame(format_);
     }
 
-     
+    int a=122;
+    qAsConst(a);
     this->setDocument(doc);
 
     qDebug()<< "frame" <<doc->rootFrame()->firstPosition();

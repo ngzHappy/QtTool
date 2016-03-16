@@ -73,7 +73,7 @@ end)");
 
     {
         QuaZip zip;
-        zip.isOpen();
+        readOnly(zip).isOpen();
     }
 
     {
@@ -85,6 +85,17 @@ end)");
         qDebug()<< *readOnly(value1);
         qDebug()<< *readOnly(value0);
         qDebug()<< *readOnly(value5);
+    }
+
+    {
+        KeyUnion key("123");
+        key.setValue("456");
+        key.setValue(-12);
+        qDebug()<< key.toUTF8() <<key.toFloat()<<key.toInt();
+        key.setValue("-12");
+        qDebug()<< key.toUTF8() <<key.toFloat()<<key.toInt();
+        key.setValue(-12.0f);
+        qDebug()<< key.toUTF8() <<key.toFloat()<<key.toInt();
     }
 
     MainWiindow window;
