@@ -14,17 +14,17 @@ TextEdit::TextEdit(QWidget * p)
     QTextDocument * doc = new QTextDocument;
     TextLayout * layout_ = new TextLayout(doc);
     doc->setDocumentLayout(layout_);
- 
+
     QTextFrameFormat format_=doc->rootFrame()->frameFormat();
     format_.setPosition(QTextFrameFormat::FloatLeft);
-    
+
     doc->rootFrame()->setFrameFormat(format_);
     format_.setBackground(QColor(122,122,122));
     format_.setBorderStyle(QTextFrameFormat::BorderStyle_DotDash);
     format_.setBorder(1);
     format_.setMargin(1);
     format_.setPadding(0);
-    
+
 
     //{
     //    QTextCursor tc(doc);
@@ -42,8 +42,6 @@ TextEdit::TextEdit(QWidget * p)
         tc.insertFrame(format_);
     }
 
-    int a=122;
-    qAsConst(a);
     this->setDocument(doc);
 
     qDebug()<< "frame" <<doc->rootFrame()->firstPosition();
@@ -51,5 +49,5 @@ TextEdit::TextEdit(QWidget * p)
     tc.movePosition(QTextCursor::MoveOperation::Start);
     tc.insertText(QString::fromUtf8(u8R"(通话记录:)"));
     this->setTextCursor(tc);
-    
+
 }

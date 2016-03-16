@@ -100,7 +100,10 @@ public:
 
     KeyUnion();
     KeyUnion(decltype(nullptr)):KeyUnion() {}
-    KeyUnion(const char * v) { setValue(QByteArray(v)); }
+    template<typename _Char_,typename _U_=std::enable_if_t<std::is_same<_Char_,char>::value>,unsigned int N=0>
+    KeyUnion(const _Char_ * & v) { setValue(QByteArray(v)); }
+    template<typename _Char_,unsigned int N >
+    KeyUnion(const _Char_(&v)[N]) { setValue<_Char_,N>(v); }
     KeyUnion(const char * v,int l) { setValue(v,l); }
     KeyUnion(const QString & v) { setValue(v); }
     KeyUnion(const std::string & v) { setValue(v); }
@@ -120,11 +123,18 @@ public:
     void setValue(QByteArray &&);
     void setValue(const QByteArray &);
     void setValue(decltype(nullptr)) { clear(); }
+
+    template<typename _Char_,typename _U_=std::enable_if_t<std::is_same<_Char_,char>::value>,unsigned int N=0>
+    void setValue(const _Char_ * & v) { setValue(QByteArray(v)); }
+    template<typename _Char_,unsigned int N >
+    void setValue(const _Char_(&v)[N]) { setValue(QByteArray(v,N)); }
+
     void setValue(const char * v,int l) { setValue(QByteArray(v,l)); }
     void setValue(const QString & v) { setValue(v.toUtf8()); }
     void setValue(const std::string & v) { setValue(QByteArray::fromStdString(v)); }
 
     void clear();
+    operator bool() const { return type_!=Type::Type_NIL; }
 };
 
 #include "ReadOnly.hpp"
