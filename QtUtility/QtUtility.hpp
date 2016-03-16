@@ -69,6 +69,7 @@ protected:
 
 #include "ReadOnly.hpp"
 #include "LUAUtiltiy.hpp"
+#include "QtTextDocumentLayout.hpp"
 
 #endif // QTUTILITY_HPP
 

@@ -8,10 +8,14 @@ TARGET = SimpleTest
 TEMPLATE = app
 
 
-SOURCES += main.cpp
+SOURCES += main.cpp \
+    TextEdit.cpp \
+    TextLayout.cpp
 SOURCES += MainWiindow.cpp
 
-HEADERS  += $$PWD/MainWiindow.hpp
+HEADERS  += $$PWD/MainWiindow.hpp \
+    TextEdit.hpp \
+    TextLayout.hpp
 
 include( $$PWD/../QtUtility/QtUtility.pri )
 DESTDIR = $$QtUtilityOutPath
