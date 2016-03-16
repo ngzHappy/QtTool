@@ -4,6 +4,7 @@
 #include <QtUtility.hpp>
 #include <QtWidgets/qtextedit.h>
 
+
 class TextEdit : public QTextEdit
 {
     Q_OBJECT

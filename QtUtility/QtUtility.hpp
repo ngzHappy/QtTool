@@ -141,6 +141,8 @@ public:
 #include "LUAUtiltiy.hpp"
 #include "QtTextDocumentLayout.hpp"
 
+Q_DECLARE_METATYPE(KeyUnion)
+
 #endif // QTUTILITY_HPP
 
 /*

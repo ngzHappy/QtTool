@@ -11,7 +11,7 @@ TextEdit::TextEdit(QWidget * p)
     :P(p)
 {
 
-    QTextDocument * doc = new QTextDocument;
+    QTextDocument * doc = new QTextDocument(this);
     TextLayout * layout_ = new TextLayout(doc);
     doc->setDocumentLayout(layout_);
 
@@ -32,22 +32,36 @@ TextEdit::TextEdit(QWidget * p)
     //    tc.insertBlock();
     //}
 
-    {
-        QTextCursor tc(doc->lastBlock());
-        tc.insertFrame(format_);
-    }
-
-    {
-        QTextCursor tc(doc->lastBlock());
-        tc.insertFrame(format_);
-    }
-
     this->setDocument(doc);
 
-    qDebug()<< "frame" <<doc->rootFrame()->firstPosition();
+    {
+        QTextCursor tc = this->textCursor();
+        tc.movePosition( QTextCursor::MoveOperation::Start );
+        tc.insertText("abcd:");
+        this->setTextCursor(tc);
+    }
+
+    {
+        QTextCursor tc = this->textCursor();
+        tc.movePosition( QTextCursor::MoveOperation::End );
+        tc.insertFrame(format_);
+        this->setTextCursor(tc);
+    }
+
+    {
+        QTextCursor tc = this->textCursor();
+        tc.movePosition( QTextCursor::MoveOperation::End );
+        tc.insertFrame(format_);
+        this->setTextCursor(tc);
+    }
+
+
+
+   /* qDebug()<< "frame" <<doc->rootFrame()->firstPosition();
     QTextCursor tc( doc->rootFrame() );
     tc.movePosition(QTextCursor::MoveOperation::Start);
     tc.insertText(QString::fromUtf8(u8R"(通话记录:)"));
     this->setTextCursor(tc);
-
+*/
+    this->setReadOnly(true);
 }
